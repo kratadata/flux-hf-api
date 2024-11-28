@@ -1,65 +1,68 @@
 import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
-import { secret_token, keyword, img_size, num_steps } from './config.js';
+import { access_token, lora_name, trigger_word, img_size, num_steps, download_image } from './config.js';
 
 async function init() {
-    const client = await Client.connect("kratadata/fhnw-image-lora", { hf_token: secret_token });
-    const display = document.getElementById('display')
-
+    const client = await Client.connect("kratadata/fhnw-image-lora", { hf_token: access_token });
+    const genInfo = document.getElementById('info')
+    let result;
+    
     document.getElementById('generate').addEventListener('click', async () => {
         const prompt = document.getElementById('prompt').value;
-        let result;
-        display.innerText = " ";
+        genInfo.innerText = "Generating image, please wait...";
         
         try {
             result = await client.predict("/infer", { 		
-                prompt: prompt + " in the style of " + keyword, 		
+                prompt: prompt + " in the style of " + trigger_word, 
+                lora: "kratadata/" + lora_name, 		
                 seed: 0, 		
                 randomize_seed: true, 		
                 width: img_size, 		
                 height: img_size, 		
                 num_inference_steps: num_steps, 
             });
+            
         } catch (error) {
             console.error("Error occurred during prediction:", error);
-            display.innerText = `Error occurred: ${error.message}`;
+            genInfo.innerText = `Error occurred: ${error.message}`;
             return; // Exit if there's an error
         }
 
         // Check for errors in the result
         if (result.error) {
             console.error("Error in result:", result.error);
+            genInfo.innerText = `Error in result: ${result.error}`;
             return; // Exit if there's an error in the result
         }
 
-        // Start the timer only if no error occurred
-        const startTime = new Date();
-        let elapsedTime = 0;
-        // Update the timer every second
-        const timerInterval = setInterval(() => {
-            elapsedTime = Math.round((new Date() - startTime) / 1000); // Calculate elapsed time in seconds
-            display.innerText = `Elapsed time: ${elapsedTime} seconds`; // Update the display
-        }, 1000);
-
-        // Log the result and elapsed time
-        console.log(result); // Log the entire result to inspect its structure
+        console.log(result); 
 
         const imageUrl = result.data[0].url; 
         if (typeof imageUrl === 'string') {
-            // Stop the timer
-            clearInterval(timerInterval);
-
             // Display the generated image
             const img = document.createElement('img');
             img.src = imageUrl; 
             document.getElementById('result').innerHTML = ''; 
             document.getElementById('result').appendChild(img);
+            genInfo.innerText = "Image generated successfully!";
+
+            addToGalery(imageUrl);
         } else {
             console.error("Expected a string URL but got:", imageUrl);
+            genInfo.innerText = "Error: Invalid image URL."; 
         }
 
-        // Stop the timer after processing the result
-        clearInterval(timerInterval);
+        
     });
+}
+
+//Display all generated images
+function addToGalery(imageUrl) {
+    const galleryItem = document.createElement('div');
+    galleryItem.className = 'gallery-item';
+    const galleryImg = document.createElement('img');
+    galleryImg.src = imageUrl;
+    galleryItem.appendChild(galleryImg);
+    document.getElementById('gallery').appendChild(galleryItem);
 }
 
 init(); 
