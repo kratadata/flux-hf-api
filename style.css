@@ -21,12 +21,13 @@ body {
     display: flex; /* Use flexbox for centering */
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
-    margin-top: 20px; /* Add some space above the result */
+    margin-bottom: 30px; /* Add some space above the result */
 }
 #result img {
-    width: 33%; /* Set the image width to 50% of its container */
+    width: 40%; /* Set the image width to 50% of its container */
     height: auto; /* Maintain aspect ratio */
 }
+
 input[type="text"] {
     padding: 10px; 
     margin-bottom: 10px; 
