@@ -1,13 +1,12 @@
 import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
-import { lora_name, trigger_word, img_size, num_steps } from './config.js';
+import { access_token, lora_name, trigger_word, img_size, num_steps, download_image } from './config.js';
+let image_counter = 0;
 
 //Initialize the client and the UI
 async function init() {
-    const client = await Client.connect("https://o1rv04k91qf5fy-7860.proxy.runpod.net/");
+    const client = await Client.connect("kratadata/fhnw-image-lora", { hf_token: access_token });
     const genInfo = document.getElementById('info')
     let result;
-    let image_counter = 0;
-
     document.getElementById('generate').addEventListener('click', async () => {
         const prompt = document.getElementById('prompt').value;
         genInfo.innerText = "Generating image, please wait...";
@@ -47,8 +46,9 @@ async function init() {
             addToGalery(imageUrl);
 
             if (download_image) {
-                image_counter++;
-                downloadImage(imageUrl);
+                img.onload = () => {
+                  //  downloadImage(imageUrl);
+                };
             }
         } else {
             console.error("Expected a string URL but got:", imageUrl);
@@ -58,15 +58,18 @@ async function init() {
         
     });
 }
+
 //Automatically download the generated image
 function downloadImage(imageUrl) {
+    image_counter++;
     fetch(imageUrl)
-        .then(response => response.blob()) 
+        .then(response => response.blob() ) 
         .then(blob => {
+            console.log(blob);
             const a = document.createElement('a');
             const url = URL.createObjectURL(blob); 
             a.href = url;
-            a.download = lora_name + '_' + image_counter + '.png';
+            a.download = lora_name + '_' + image_counter + '.webp';
             document.body.appendChild(a); 
             a.click(); 
             document.body.removeChild(a); 

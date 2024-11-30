@@ -3,6 +3,7 @@
 ## Configuration Parameters
 
 1. Open `config.js` and change following parameters:
+    - `access_token`: The HuggingFace API token to access private models.
     - `trigger_word`: The keyword to use for the image generation.
     - `lora_name`: The name of the LoRA model to use for the image generation.
     - `img_size`: The size of the image to generate. 1024 is recommended for better quality.
