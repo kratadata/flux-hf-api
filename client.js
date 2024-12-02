@@ -47,7 +47,7 @@ async function init() {
 
             if (download_image) {
                 img.onload = () => {
-                  //  downloadImage(imageUrl);
+                   // downloadImage(imageUrl);
                 };
             }
         } else {
@@ -60,22 +60,13 @@ async function init() {
 }
 
 //Automatically download the generated image
+//NEEDS TO BE IMPLEMENTED
 function downloadImage(imageUrl) {
     image_counter++;
-    fetch(imageUrl)
-        .then(response => response.blob() ) 
-        .then(blob => {
-            console.log(blob);
-            const a = document.createElement('a');
-            const url = URL.createObjectURL(blob); 
-            a.href = url;
-            a.download = lora_name + '_' + image_counter + '.webp';
-            document.body.appendChild(a); 
-            a.click(); 
-            document.body.removeChild(a); 
-            URL.revokeObjectURL(url); 
-        })
-        .catch(error => console.error('Error downloading the image:', error));
+    const a = document.createElement('a');
+    a.href = imageUrl; // Use the direct image URL
+    a.download = lora_name + '_' + image_counter + '.jpg';
+    a.click(); 
 }
 
 //Display all generated images
